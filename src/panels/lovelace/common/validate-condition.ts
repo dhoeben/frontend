@@ -4,6 +4,8 @@ import {
   listenMediaQuery,
 } from "../../../common/dom/media_query";
 import { isValidEntityId } from "../../../common/entity/valid_entity_id";
+import { firstWeekdayIndex } from "../../../../../common/datetime/first_weekday";
+import type { LocalizeFunc } from "../../../../../common/translations/localize";
 import { UNAVAILABLE } from "../../../data/entity";
 import { HomeAssistant } from "../../../types";
 
@@ -11,6 +13,7 @@ export type Condition =
   | NumericStateCondition
   | StateCondition
   | ScreenCondition
+  | TimeCondition
   | UserCondition
   | OrCondition
   | AndCondition;
@@ -43,6 +46,13 @@ export interface StateCondition extends BaseCondition {
 export interface ScreenCondition extends BaseCondition {
   condition: "screen";
   media_query?: string;
+}
+
+export interface TimeCondition extends BaseCondition {
+  condition: "time";
+  after?: string;
+  before?: string;
+  weekday?: string | string[];
 }
 
 export interface UserCondition extends BaseCondition {
@@ -138,6 +148,41 @@ function checkScreenCondition(condition: ScreenCondition, _: HomeAssistant) {
   return condition.media_query
     ? matchMedia(condition.media_query).matches
     : false;
+}
+
+
+const DAYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
+
+function checkTimeCondition(condition: TimeCondition, hass: HomeAssistant) {
+  const state = (condition.entity ? hass.states[condition.entity] : undefined)
+    ?.state;
+  let above = condition.above;
+  let below = condition.below;
+
+  // Handle entity_id, UI should be updated for conditionnal card (filters does not have UI for now)
+  if (typeof above === "string") {
+    above = getValueFromEntityId(hass, above) ?? above;
+  }
+  if (typeof below === "string") {
+    below = getValueFromEntityId(hass, below) ?? below;
+  }
+
+  const numericState = Number(state);
+  const numericAbove = Number(above);
+  const numericBelow = Number(below);
+
+  if (isNaN(numericState)) {
+    return false;
+  }
+
+  return (
+    (condition.above == null ||
+      isNaN(numericAbove) ||
+      numericAbove < numericState) &&
+    (condition.below == null ||
+      isNaN(numericBelow) ||
+      numericBelow > numericState)
+  );
 }
 
 function checkUserCondition(condition: UserCondition, hass: HomeAssistant) {
