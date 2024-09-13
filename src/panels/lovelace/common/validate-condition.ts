@@ -18,6 +18,7 @@ export type Condition =
 // Legacy conditional card condition
 export interface LegacyCondition {
   entity?: string;
+  entity_id?: string;
   state?: string | string[];
   state_not?: string | string[];
 }
@@ -29,6 +30,7 @@ interface BaseCondition {
 export interface NumericStateCondition extends BaseCondition {
   condition: "numeric_state";
   entity?: string;
+  entity_id?: string;
   below?: string | number;
   above?: string | number;
 }
@@ -36,6 +38,7 @@ export interface NumericStateCondition extends BaseCondition {
 export interface StateCondition extends BaseCondition {
   condition: "state";
   entity?: string;
+  entity_id?: string;
   state?: string | string[];
   state_not?: string | string[];
 }
