@@ -20,10 +20,14 @@ export interface LockEntity extends HassEntityBase {
   attributes: LockEntityAttributes;
 }
 
-type ProtectedLockService = "lock" | "unlock" | "open";
+type ProtectedLockService = "lock" | "unlock" | "open" | "night";
 
 export function isLocked(stateObj: LockEntity) {
   return stateObj.state === "locked";
+}
+
+export function isOpening(stateObj: LockEntity) {
+  return stateObj.state === "night";
 }
 
 export function isUnlocked(stateObj: LockEntity) {
