@@ -74,6 +74,14 @@ export function canLock(stateObj: LockEntity) {
   return assumedState || (!isLocked(stateObj) && !isWaiting(stateObj));
 }
 
+export function canLockNight(stateObj: LockEntity) {
+  if (stateObj.state === UNAVAILABLE) {
+    return false;
+  }
+  const assumedState = stateObj.attributes.assumed_state === true;
+  return assumedState || (!isLockedNight(stateObj) && !isWaiting(stateObj));
+}
+
 export function canUnlock(stateObj: LockEntity) {
   if (stateObj.state === UNAVAILABLE) {
     return false;
