@@ -37,7 +37,7 @@ export class HaStateControlLockToggle extends LitElement {
     super.willUpdate(changedProps);
     if (changedProps.has("stateObj")) {
       this._isOn =
-        this.stateObj.state === "locked" || this.stateObj.state === "locking";
+        this.stateObj.state === "locked" || this.stateObj.state === "locked-night" || this.stateObj.state === "locking";
     }
   }
 
@@ -117,36 +117,23 @@ export class HaStateControlLockToggle extends LitElement {
     }
 
     return html`
-      <ha-control-switch
-        touch-action="none"
+      <ha-control-select
         vertical
-        reversed
-        .checked=${this._isOn}
-        @change=${this._valueChanged}
-        .ariaLabel=${this._isOn
-          ? this.hass.localize("ui.card.lock.unlock")
-          : this.hass.localize("ui.card.lock.lock")}
+        .options=${options}
+        .value=${this.lockValue}
+        @value-change=${this._lockValueChanged}
+        .ariaLabel=${computeAttributeNameDisplay(
+          this.hass.localize,
+          this.stateObj,
+          this.hass.entities,
+        )}
         style=${styleMap({
-          "--control-switch-on-color": color,
-          "--control-switch-off-color": color,
+          "--control-select-color": color,
+          "--control-select-background": color,
         })}
         .disabled=${this.stateObj.state === UNAVAILABLE}
       >
-        <ha-state-icon
-          slot="icon-on"
-          .hass=${this.hass}
-          .stateObj=${this.stateObj}
-          .stateValue=${locking ? "locking" : "locked"}
-          class=${classMap({ pulse: locking })}
-        ></ha-state-icon>
-        <ha-state-icon
-          slot="icon-off"
-          .hass=${this.hass}
-          .stateObj=${this.stateObj}
-          .stateValue=${unlocking ? "unlocking" : "unlocked"}
-          class=${classMap({ pulse: unlocking })}
-        ></ha-state-icon>
-      </ha-control-switch>
+      </ha-control-select>
     `;
   }
 
