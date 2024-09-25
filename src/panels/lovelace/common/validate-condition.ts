@@ -18,12 +18,21 @@ export type Condition =
 // Legacy conditional card condition
 export interface LegacyCondition {
   entity?: string;
+  floor?: string;
+  area?: string;
+  domain?: string;
   state?: string | string[];
   state_not?: string | string[];
 }
 
 interface BaseCondition {
   condition: string;
+}e: string
+): string | undefined {
+  if (isValidFloorId(value) && hass.states[value]) {
+    return hass.states[value]?.state;
+  }
+  return undefined;
 }
 
 export interface NumericStateCondition extends BaseCondition {
@@ -36,6 +45,9 @@ export interface NumericStateCondition extends BaseCondition {
 export interface StateCondition extends BaseCondition {
   condition: "state";
   entity?: string;
+  floor?: string;
+  area?: string;
+  domain?: string;
   state?: string | string[];
   state_not?: string | string[];
 }
